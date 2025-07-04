@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>markdown editor</title>
+  </head>
+      <body id="body">
+        <main class="container" id="container" title="ctrl + o to open • ctrl + s to save">
+            <textarea
+                name=""
+                id="source"
+                class="source"
+                cols="50"
+                rows="30"
+                placeholder="enter markdown"
+            ></textarea>
+
+            <div id="devider" class="devider"></div>
+            <div id="content" class="content"></div>
+            <input type="file" id="hidden-file-input" style="display: none;" accept=".md, .docx">
+        </main>
+        <script type="module" src="/src/main.js"></script>
+    </body>
+</html>
