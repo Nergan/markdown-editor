@@ -3,10 +3,8 @@ import { marked } from "marked";
 import * as mammoth from "mammoth";
 import HtmlToDocx from "@turbodocx/html-to-docx"
 
-const container = document.getElementById('container');
 const contentHere = document.getElementById('content');
 const sourceArea = document.getElementById('source');
-const devider = document.getElementById('devider');
 
 
 const renderMarkdown = async () => {
