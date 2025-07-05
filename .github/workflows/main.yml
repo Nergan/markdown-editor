@@ -5,8 +5,7 @@ on:
     branches:
       - main
 
-permissions:
-  write-all: true
+permissions: write-all
 
 jobs:
   build:
