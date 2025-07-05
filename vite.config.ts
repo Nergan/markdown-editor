@@ -5,6 +5,7 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
 export default defineConfig({
   plugins: [
     basicSsl(),
-    nodePolyfills(),
-  ]
+    nodePolyfills()
+  ],
+  base: "/markdown-editor/"
 })
