@@ -7,5 +7,5 @@ export default defineConfig({
     basicSsl(),
     nodePolyfills(),
   ],
+  base: "/markdown-editor/"
 })
-
