@@ -1,10 +1,13 @@
 import './style.css';
-import { marked } from "marked";
-import * as mammoth from "mammoth";
-import HtmlToDocx from "@turbodocx/html-to-docx"
+import { marked } from 'marked';
+import { convertToMarkdown } from 'mammoth';
+import { init, DocxAdapter } from 'html-to-document';
+
 
 const contentHere = document.getElementById('content');
 const sourceArea = document.getElementById('source');
+const textarea = document.getElementById('source');
+const fileInput = document.getElementById('hidden-file-input');
 
 
 const renderMarkdown = async () => {
@@ -13,57 +16,66 @@ const renderMarkdown = async () => {
 }
 
 
-function isdocx(file) {
-    if (!file || !file.name) {
-        return false; // Обработка случая, когда file не является объектом File или у него нет имени
-    }
-    const filename = file.name.toLowerCase();
-    return filename.endsWith(".docx");
-}
- 
-
 sourceArea.addEventListener('keyup', () => {
     const newText = marked.parse(sourceArea.value);
     contentHere.innerHTML = newText;
 });
 
 
-// Кэшируем элементы DOM
-const textarea = document.getElementById('source');
-const fileInput = document.getElementById('hidden-file-input');
+function isdocx(file) {
+    if (!file || !file.name) {
+        return false;
+    }
+    const filename = file.name.toLowerCase();
+    return filename.endsWith(".docx");
+}
 
-// Функция сохранения файла
 async function saveFile(content, filename = 'name.md') {
   const blob = new Blob([content], { type: 'text/markdown, application/msword' });
   const url = URL.createObjectURL(blob);
-  try {
 
-    const handle = await window.showSaveFilePicker({
-        suggestedName: filename,
-        types: [{
-            description: 'markdown',
-            accept: { 'text/markdown': ['.md'] }
-        },{
-            description: 'word',
-            accept: { 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'] }
-        }]
-    })
+  try {
+    try {
+        const handle = await window.showSaveFilePicker({
+            suggestedName: filename,
+            types: [{
+                description: 'markdown',
+                accept: { 'text/markdown': ['.md'] }
+            },{
+                description: 'word',
+                accept: { 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'] }
+            }],
+            excludeAcceptAllOption: true
+        })
+    } catch (AbortError) {
+        return;
+    }
 
     const name = handle.name;
     if (name.endsWith('.docx')) {
+
+        const converter = init({
+            adapters: {
+                register: [
+                    { format: 'docx', adapter: DocxAdapter },
+                ],
+            },
+        });
+
         content = document.getElementById('content').innerHTML;
-        content = await HtmlToDocx(content);
+        content = await converter.convert(content, 'docx');
     }
 
     const writeble = await handle.createWritable();
     writeble.write(content);
     writeble.close();
-  } finally {
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
+
+    } finally {
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
 }
 
-// Обработчик горячих клавиш
+
 window.addEventListener('keydown', (e) => {
     const isSave = (e.ctrlKey || e.metaKey) && e.code === 'KeyS';
     const isOpen = (e.ctrlKey || e.metaKey) && e.code === 'KeyO';
@@ -77,7 +89,6 @@ window.addEventListener('keydown', (e) => {
     }
 });
 
-// Обработчик выбора файла
 fileInput?.addEventListener('change', (e) => {
     const [file] = e.target.files || [];
     const arrayBuffer = file.arrayBuffer();
@@ -85,7 +96,7 @@ fileInput?.addEventListener('change', (e) => {
     if (!file) return;
 
     if (isdocx(file)) {
-        mammoth.convertToMarkdown({ arrayBuffer }).then((result) => {
+        convertToMarkdown({ arrayBuffer }).then((result) => {
             textarea.value = result.value;
             renderMarkdown();
         })

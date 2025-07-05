@@ -15,7 +15,7 @@
     "vite-plugin-node-polyfills": "^0.23.0"
   },
   "dependencies": {
-    "@turbodocx/html-to-docx": "^1.13.4",
+    "html-to-document": "^0.3.0",
     "mammoth": "^1.9.1",
     "marked": "^16.0.0"
   }
