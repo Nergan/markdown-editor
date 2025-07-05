@@ -1,6 +1,3 @@
-<Katbin/>
-Register
-Log in
 name: auto-publish
 
 on:
@@ -37,5 +34,4 @@ jobs:
           BRANCH: gh-pages
           FOLDER: dist
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-© 2025 SphericalKat
-Fork me!
+          
