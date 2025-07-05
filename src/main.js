@@ -9,7 +9,6 @@ const sourceArea = document.getElementById('source');
 const textarea = document.getElementById('source');
 const fileInput = document.getElementById('hidden-file-input');
 
-
 const renderMarkdown = async () => {
     const newText = await marked.parse(sourceArea.value);
     contentHere.innerHTML = newText;
@@ -29,6 +28,7 @@ function isdocx(file) {
     const filename = file.name.toLowerCase();
     return filename.endsWith(".docx");
 }
+
 
 async function saveFile(content, filename = 'name.md') {
   const blob = new Blob([content], { type: 'text/markdown, application/msword' });
