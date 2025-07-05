@@ -6,6 +6,5 @@ export default defineConfig({
   plugins: [
     basicSsl(),
     nodePolyfills(),
-  ],
-  base: "/markdown-editor/"
+  ]
 })
