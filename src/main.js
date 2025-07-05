@@ -15,12 +15,6 @@ const renderMarkdown = async () => {
 }
 
 
-sourceArea.addEventListener('keyup', () => {
-    const newText = marked.parse(sourceArea.value);
-    contentHere.innerHTML = newText;
-});
-
-
 function isdocx(file) {
     if (!file || !file.name) {
         return false;
@@ -29,12 +23,10 @@ function isdocx(file) {
     return filename.endsWith(".docx");
 }
 
-
 async function saveFile(content, filename = 'name.md') {
-  const blob = new Blob([content], { type: 'text/markdown, application/msword' });
-  const url = URL.createObjectURL(blob);
+    const blob = new Blob([content], { type: 'text/markdown, application/msword' });
+    const url = URL.createObjectURL(blob);
 
-  try {
     try {
         const handle = await window.showSaveFilePicker({
             suggestedName: filename,
@@ -46,51 +38,58 @@ async function saveFile(content, filename = 'name.md') {
                 accept: { 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'] }
             }],
             excludeAcceptAllOption: true
-        })
-    } catch (AbortError) {
-        return;
-    }
-
-    const name = handle.name;
-    if (name.endsWith('.docx')) {
-
-        const converter = init({
-            adapters: {
-                register: [
-                    { format: 'docx', adapter: DocxAdapter },
-                ],
-            },
         });
 
-        content = document.getElementById('content').innerHTML;
-        content = await converter.convert(content, 'docx');
-    }
+        const name = handle.name;
+        if (name.endsWith('.docx')) {
+            const converter = init({
+                adapters: {
+                    register: [
+                        { format: 'docx', adapter: DocxAdapter },
+                    ],
+                },
+            });
+            content = document.getElementById('content').innerHTML;
+            content = await converter.convert(content, 'docx');
+        }
 
-    const writeble = await handle.createWritable();
-    writeble.write(content);
-    writeble.close();
-
+        const writeble = await handle.createWritable();
+        writeble.write(content);
+        writeble.close();
+    } catch (AbortError) {
+        return;
     } finally {
         setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 }
 
 
-window.addEventListener('keydown', (e) => {
-    const isSave = (e.ctrlKey || e.metaKey) && e.code === 'KeyS';
-    const isOpen = (e.ctrlKey || e.metaKey) && e.code === 'KeyO';
+window.addEventListener('beforeunload', function(event) {
+    event.preventDefault();
+    event.returnValue = '';
+    return '';
+});
+
+window.addEventListener('keydown', (event) => {
+    const isSave = (event.ctrlKey || event.metaKey) && event.code === 'KeyS';
+    const isOpen = (event.ctrlKey || event.metaKey) && event.code === 'KeyO';
 
     if (isSave && textarea) {
-        e.preventDefault();
+        event.preventDefault();
         saveFile(textarea.value);
     } else if (isOpen) {
-        e.preventDefault();
+        event.preventDefault();
         fileInput?.click();
     }
 });
 
-fileInput?.addEventListener('change', (e) => {
-    const [file] = e.target.files || [];
+sourceArea.addEventListener('keyup', () => {
+    const newText = marked.parse(sourceArea.value);
+    contentHere.innerHTML = newText;
+});
+
+fileInput?.addEventListener('change', (event) => {
+    const [file] = event.target.files || [];
     const arrayBuffer = file.arrayBuffer();
 
     if (!file) return;
@@ -110,5 +109,5 @@ fileInput?.addEventListener('change', (e) => {
         }
         reader.readAsText(file);
     }
-    e.target.value = '';
+    event.target.value = '';
 });
