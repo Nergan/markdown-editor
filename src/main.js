@@ -18,7 +18,8 @@ const renderMarkdown = async () => {
 function updateURL(text) {
     const url = new URL(window.location);
     if (text) {
-        url.searchParams.set('text', text);
+        const compressed = LZString.compressToEncodedURIComponent(text);
+        url.searchParams.set('text', compressed);
     } else {
         url.searchParams.delete('text');
     }
@@ -125,10 +126,17 @@ fileInput?.addEventListener('change', (event) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('source');
-    
     const params = new URLSearchParams(window.location.search);
+    
     if (params.has('text')) {
-        input.value = decodeURIComponent(params.get('text'));
+        const compressedText = params.get('text');
+        const decompressedText = LZString.decompressFromEncodedURIComponent(compressedText);
+        
+        if (decompressedText !== null) {
+            input.value = decompressedText;
+        } else {
+            input.value = decodeURIComponent(compressedText);
+        }
     }
     
     input.addEventListener('input', () => {
