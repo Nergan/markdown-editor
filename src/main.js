@@ -141,5 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     input.addEventListener('input', () => {
         updateURL(input.value);
+        renderMarkdown();
     });
 });
