@@ -15,6 +15,16 @@ const renderMarkdown = async () => {
 }
 
 
+function updateURL(text) {
+    const url = new URL(window.location);
+    if (text) {
+        url.searchParams.set('text', text);
+    } else {
+        url.searchParams.delete('text');
+    }
+    history.replaceState(null, '', url);
+}
+
 function isdocx(file) {
     if (!file || !file.name) {
         return false;
@@ -22,6 +32,7 @@ function isdocx(file) {
     const filename = file.name.toLowerCase();
     return filename.endsWith(".docx");
 }
+
 
 async function saveFile(content, filename = 'name.md') {
     const blob = new Blob([content], { type: 'text/markdown, application/msword' });
@@ -110,4 +121,17 @@ fileInput?.addEventListener('change', (event) => {
         reader.readAsText(file);
     }
     event.target.value = '';
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('source');
+    
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('text')) {
+        input.value = decodeURIComponent(params.get('text'));
+    }
+    
+    input.addEventListener('input', () => {
+        updateURL(input.value);
+    });
 });
