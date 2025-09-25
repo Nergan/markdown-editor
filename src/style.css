@@ -25,7 +25,7 @@ body {
 .devider {
     cursor: col-resize;
     height: 100%;
-    width: 1px;
+    width: 5px;
     background-color: #000000;
 }
 
